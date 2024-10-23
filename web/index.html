@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quejas Data</title>
+    <style>
+        body {
+            background-color: #f0f0f0; /* Light gray background */
+            color: #333; /* Dark gray text */
+            font-family: Arial, sans-serif; /* Use Arial font */
+            line-height: 1.6; /* Improve readability */
+        }
+
+        h1 {
+            color: #007bff; /* Blue heading text */
+            text-align: center; /* Center align heading */
+        }
+
+        .container {
+            margin: 30px auto; /* Center the container */
+            padding: 20px; /* Add padding */
+            background-color: #fff; /* White background */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add shadow */
+        }
+
+        label {
+            font-weight: bold; /* Bold labels */
+            display: block;
+            margin: 10px 0 5px 0; /* Add space around labels */
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px; /* Larger text for inputs */
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #007bff; /* Blue submit button */
+            color: #fff; /* White text */
+            border: none; /* Remove border */
+            border-radius: 5px;
+            cursor: pointer; /* Add pointer cursor */
+            font-size: 16px; /* Larger text for button */
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+        /* Add scrollable table container */
+        .table-container {
+            margin-top: 20px;
+            overflow-x: auto; /* Horizontal scroll */
+            max-width: 100%; /* Prevent table from exceeding container */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px; /* Ensures table doesn't shrink too much */
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px; /* Slightly smaller text for table */
+        }
+
+        th {
+            background-color: #f2f2f2; /* Light gray header background */
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9; /* Alternate row background color */
+        }
+
+        /* Additional styling for mobile responsiveness */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+
+            input[type="text"], textarea, select, input[type="submit"] {
+                font-size: 14px;
+            }
+
+            table, th, td {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <!-- Desplegable para Urgencia -->
+        <label for="urgencia">Urgencia:</label>
+        <select name="urgencia" id="urgencia">
+            <option value="BAJA">BAJA</option>
+            <option value="MEDIA">MEDIA</option>
+            <option value="ALTA">ALTA</option>
+        </select>
+        
+        <!-- Desplegable para Tipo -->
+        <label for="tipo">Tipo:</label>
+        <select name="tipo" id="tipo">
+            <option value="ALUMBRADO">ALUMBRADO</option>
+            <option value="CAMINOS">CAMINOS</option>
+            <option value="JARDINERÍA">JARDINERÍA</option>
+            <option value="MANTENIMIENTO">MANTENIMIENTO</option>
+            <option value="OTROS">OTROS</option>
+        </select>
+    
+        <!-- Campo para Nombre del Propietario -->
+        <label for="nombre_propietario">Nombre del Propietario:</label>
+        <input type="text" name="nombre_propietario" id="nombre_propietario">
+    
+        <!-- Campo para Título -->
+        <label for="titulo">Título:</label>
+        <input type="text" name="titulo" id="titulo">
+    
+        <!-- Campo para Detalle -->
+        <label for="detalle">Detalle:</label>
+        <textarea name="detalle" id="detalle" rows="4" cols="50"></textarea>
+    
+        <!-- Botón para enviar el formulario -->
+        <input type="submit" id="savecomplaint" value="Guardar Queja">
+        <p id="complaintSaved"></p>
+        
+        <br>
+        <input type="submit" id="getstudents" value="Ver todas las quejas">
+        <br><br>
+        <div id="showComplaint">
+            <!-- Scrollable table container -->
+            <div class="table-container">
+                <table id="quejasVecinos">
+                    <thead>
+                        <tr>
+                            <th>Urgencia</th>  
+                            <th>Fecha</th>
+                            <th>Nombre del Propietario</th>
+                            <th>Tipo de Denuncia</th>
+                            <th>Servicio</th>
+                            <th>Detalle</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Las quejas se verán acá -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js"></script>
+</body>
+</html>
