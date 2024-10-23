@@ -1,0 +1,11 @@
+# Ignorar la carpeta .terraform
+.terraform/
+
+# Ignorar el archivo .terraform.lock.hcl
+.terraform.lock.hcl
+terraform_outputs.json
+terraform_run.log
+
+# Ignorar los archivos con extensión .tfstate
+*.tfstate
+*.tfstate.backup
