@@ -87,38 +87,6 @@ echo "$tfContent" > $subirScriptFile
 # Mensaje de confirmación
 echo "Archivo subir_script.tf creado exitosamente."
 
-lambdaRedirect="lamda_functions/redirect.py"
-
-tfContent=$(cat <<EOF
-import json
-url = "$bucketLink"
-
-def lambda_handler(event, context):
-    # Extraer el code de los parámetros de la URL
-    code = event['queryStringParameters'].get('code')
-    
-    if code:
-        # Redirigir a la URL de S3 con el code
-        redirect_url = f"http://{url}?code={code}"
-    else:
-        # Si no hay code, redirigir a la URL base o mostrar un error
-        redirect_url = f"http://{url}"
-    
-    # Devolver la respuesta de redirección
-    response = {
-        "statusCode": 301,
-        "headers": {
-            "Location": redirect_url
-        }
-    }
-    
-    return response
-EOF
-)
-
-# Escribir el contenido en subir_script.tf
-echo "$tfContent" > $lambdaRedirect
-
 # Ejecutar terraform apply para subir el archivo a S3
 echo "Ejecutando terraform apply..."
 terraform apply -auto-approve | tee -a $logFile
