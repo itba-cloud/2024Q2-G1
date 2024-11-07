@@ -18,7 +18,10 @@ def lambda_handler(event, context):
         tipo = body['tipo']
         nombre_propietario = body['nombre_propietario']
         titulo = body['titulo']
-        detalle = body['detalle']
+        detalle = body['detalle']        
+
+        # Obtener el email del usuario desde el token de identidad de Cognito
+        email_usuario = event['requestContext']['authorizer']['claims']['email']
         
         # Crear el idDenuncia automáticamente (UUID)
         idDenuncia = str(uuid.uuid4())
@@ -40,7 +43,8 @@ def lambda_handler(event, context):
             'nombre_propietario': nombre_propietario,
             'titulo': titulo,
             'detalle': detalle,
-            'estado': estado
+            'estado': estado,
+            'mail': email_usuario
         }
         
         # Insertar el ítem en la tabla DynamoDB

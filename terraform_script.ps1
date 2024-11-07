@@ -1,3 +1,5 @@
+Write-Output "Ejecutando versión actualizada"
+
 # Variables
 $outputFile = "terraform_outputs.json"
 $logFile = "terraform_run.log"
@@ -67,13 +69,13 @@ $newContent | Out-File -FilePath $outputFile -Encoding UTF8
 # Mensaje de confirmación
 Write-Output "Variables agregadas exitosamente al inicio del archivo scripts.js."
 
-$subirScriptFile = "subir_script.tf"
+$subirScriptFile = "subir_script2.tf"
 
 # Crear el archivo subir_script.tf
 $tfContent = @"
 # Subir el archivo scripts.js
 resource "aws_s3_object" "scripts_js" {
-  bucket = aws_s3_bucket.static_site.bucket
+  bucket = module.s3_static_site.bucket_name
   key    = "scripts.js"
   source = "web/scripts.js"  # Ruta local del archivo
   content_type = "application/javascript"
@@ -85,33 +87,6 @@ $tfContent | Out-File -FilePath $subirScriptFile -Encoding UTF8
 
 # Mensaje de confirmación
 Write-Output "Archivo subir_script.tf creado exitosamente."
-
-$lambdaRedirect = "lamda_functions/redirect.py"
-
-$tfContent = @"
-import json
-url = "$bucketLink"
-
-def lambda_handler(event, context):
-    code = event['queryStringParameters'].get('code')
-    
-    if code:
-        redirect_url = f"http://{url}?code={code}"
-    else:
-        redirect_url = f"http://{url}"
-    
-    response = {
-        "statusCode": 301,
-        "headers": {
-            "Location": redirect_url
-        }
-    }
-    
-    return response
-"@
-
-# Escribir el contenido en lambda_redirect.py
-$tfContent | Out-File -FilePath $lambdaRedirect -Encoding UTF8
 
 # Ejecutar terraform apply para subir el archivo a S3
 Write-Output "Ejecutando terraform apply..."

@@ -73,7 +73,7 @@ subirScriptFile="subir_script.tf"
 tfContent=$(cat <<EOF
 # Subir el archivo scripts.js
 resource "aws_s3_object" "scripts_js" {
-  bucket = aws_s3_bucket.static_site.bucket
+  bucket = module.s3_static_site.bucket_name
   key    = "scripts.js"
   source = "web/scripts.js"  # Ruta local del archivo
   content_type = "application/javascript"

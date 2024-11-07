@@ -18,6 +18,12 @@ data "archive_file" "redirect_code" {
     output_path = "output_lambda_functions/lambda_redirect_src.zip"
 }
 
+data "archive_file" "dynamoStreamSNS_code" {
+    type = "zip"
+    source_file = "lamda_functions/dynamoStreamSNS.py"
+    output_path = "output_lambda_functions/dynamoStreamSNS_src.zip"
+}
+
 data "aws_availability_zones" "available" {
   state = "available"
 }
