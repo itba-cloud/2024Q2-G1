@@ -25,7 +25,7 @@ module "dynamoQuejas" {
 
 module "alerta_dynamo" {
   source                 = "./modules/alerta_dynamo"
-  email_endpoint         = "federicoabancens@gmail.com"
+  email_endpoint         = var.mail_admin
   lambda_name            = "dynamoStreamSNS"
   lambda_role_arn        = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
   lambda_filename        = "output_lambda_functions/dynamoStreamSNS_src.zip"

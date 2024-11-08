@@ -141,6 +141,7 @@ resource "aws_api_gateway_deployment" "deployment" {
   depends_on = [
     aws_api_gateway_integration.get_integration,
     aws_api_gateway_integration.post_integration,
+    aws_api_gateway_integration.redirect_integration
   ]
 }
 

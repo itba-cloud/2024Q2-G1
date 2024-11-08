@@ -18,6 +18,10 @@ variable "nombre_bucket" {
   type = string
 }
 
+variable "mail_admin" {
+  description = "Mail del admin que recibe las alertas"
+  type = string
+}
 
 #A las subnets les paso la cantidad de AZs que quiero
 variable "cant_AZ" {
