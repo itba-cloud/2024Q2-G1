@@ -23,6 +23,41 @@ module "dynamoQuejas" {
   }
 }
 
+
+#Agregar un registro a la DynamoDB
+resource "aws_dynamodb_table_item" "queja_jardineria" {
+  table_name = module.dynamoQuejas.table_name
+  hash_key   = "pk_urg"
+  range_key  = "sk_tipo_id"
+
+  item = <<ITEM
+  {
+    "pk_urg": {"S": "URG#ALTA"},
+    "sk_tipo_id": {"S": "TIPO#JARDINERÍA#9cf10a83-6374-42b6-be67-asdasdd"},
+    "detalle": {"S": "iaisjdab"},
+    "estado": {"S": "PENDIENTE"},
+    "fecha": {"S": "2024-10-10"},
+    "idDenuncia": {"S": "9cf10a83-6374-42b6-be67-8d6c252f41e4"},
+    "nombre_propietario": {"S": "Fede Capo"},
+    "tipo": {"S": "JARDINERÍA"},
+    "titulo": {"S": "laksjdlkj"},
+    "urgencia": {"S": "ALTA"}
+  }
+  ITEM
+}
+
+module "dynamoReservas" {
+  source        = "./modules/dynamo"
+  table_name    = "ReservasVecinosTerra"
+  hash_key      = "pk_fecha"
+  range_key     = "sk_espacio_reserva"
+  read_capacity = 1
+  write_capacity = 1
+  tags          = {
+    Name = "DynamoReservaCanchas"
+  }
+}
+
 module "alerta_dynamo" {
   source                 = "./modules/alerta_dynamo"
   email_endpoint         = var.mail_admin
@@ -98,6 +133,38 @@ resource "aws_lambda_function" "post_denuncia" {
   }
 }
 
+resource "aws_lambda_function" "add_reserva" {
+  function_name = "addReserva"
+  role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
+  handler       = "addReserva.lambda_handler"
+  runtime       = "python3.11"
+  timeout       = 60
+  memory_size   = 128
+  filename = "output_lambda_functions/lambda_addReserva_src.zip"
+  source_code_hash = data.archive_file.addReserva_code.output_base64sha256
+  depends_on = [ module.vpc_interno ]
+  vpc_config {
+    subnet_ids         = flatten([module.vpc_interno.subnet_ids])
+    security_group_ids = [aws_security_group.lambda_sg.id]
+  }
+}
+
+resource "aws_lambda_function" "get_reserva" {
+  function_name = "getReserva"
+  role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
+  handler       = "getReserva.lambda_handler"
+  runtime       = "python3.11"
+  timeout       = 60
+  memory_size   = 128
+  filename = "output_lambda_functions/lambda_getReserva_src.zip"
+  source_code_hash = data.archive_file.getReserva_code.output_base64sha256
+  depends_on = [ module.vpc_interno ]
+  vpc_config {
+    subnet_ids         = flatten([module.vpc_interno.subnet_ids])
+    security_group_ids = [aws_security_group.lambda_sg.id]
+  }
+}
+
 resource "aws_lambda_function" "redirect" {
   function_name = "redirect"
   role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
@@ -121,10 +188,14 @@ module "api_gateway" {
   api_description            = "API de Terraform para quejas de vecinos"
   cognito_authorizer_id      = module.cognito.authorizer_id
   get_lambda_uri             = aws_lambda_function.get_denuncia.invoke_arn
+  getReservas_lambda_uri     = aws_lambda_function.get_reserva.invoke_arn
   post_lambda_uri            = aws_lambda_function.post_denuncia.invoke_arn
+  postReservas_lambda_uri    = aws_lambda_function.add_reserva.invoke_arn
   redirect_lambda_uri        = aws_lambda_function.redirect.invoke_arn
   get_lambda_function_name   = aws_lambda_function.get_denuncia.function_name
+  getReservas_lambda_function_name   = aws_lambda_function.get_reserva.function_name
   post_lambda_function_name  = aws_lambda_function.post_denuncia.function_name
+  postReservas_lambda_function_name  = aws_lambda_function.add_reserva.function_name
   redirect_lambda_function_name = aws_lambda_function.redirect.function_name
   stage_name                 = "prod"
 }

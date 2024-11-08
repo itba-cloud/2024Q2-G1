@@ -60,7 +60,7 @@ def lambda_handler(event, context):
             'headers': {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
-            }
+            } 
         }
     except Exception as e:
         # En caso de error

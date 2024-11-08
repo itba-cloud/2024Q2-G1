@@ -76,7 +76,7 @@ document.getElementById("savecomplaint").onclick = function() {
         };
 
         $.ajax({
-            url: API_ENDPOINT,
+            url: API_ENDPOINT+ "/quejasVecinos",
             type: 'POST',
             data: JSON.stringify(inputData),
             contentType: 'application/json; charset=utf-8',
@@ -106,7 +106,7 @@ document.getElementById("getstudents").onclick = function(){
         }
         console.log('El token es:', token); // Imprime el token resultante
         $.ajax({
-            url: API_ENDPOINT,
+            url: API_ENDPOINT+ "/quejasVecinos",
             type: 'GET',
             contentType: 'application/json; charset=utf-8',
             headers: {
@@ -135,3 +135,81 @@ document.getElementById("getstudents").onclick = function(){
         console.error('Error obteniendo el token:', error);
     });      
 }
+
+// *** NUEVO *** AJAX POST para agregar una reserva
+document.getElementById("addReserva").onclick = function() {
+    getToken()
+    .then(token => {
+        if (!token) {
+            console.error('No token available');
+            return;
+        }
+        
+        var reservaData = {
+            "fecha": $('#fecha').val(),
+            "espacio": $('#espacio').val(),
+            "horario": $('#horario').val()
+        };
+
+        $.ajax({
+            url: API_ENDPOINT + "/reservasCanchas",
+            type: 'POST',
+            data: JSON.stringify(reservaData),
+            contentType: 'application/json; charset=utf-8',
+            headers: {
+                'Authorization': token  // Incluye el token de autorización
+            },
+            success: function (response) {
+                document.getElementById("reservaConfirmada").innerHTML = "Reserva realizada correctamente.";
+            },
+            error: function (xhr) {
+                if (xhr.status === 409) {  // Si el error es 409, conflicto
+                    var errorResponse = JSON.parse(xhr.responseText);
+                    document.getElementById("reservaConfirmada").innerHTML = errorResponse.error;
+                } else {
+                    alert("Error al realizar la reserva.");
+                }
+            }
+        });
+    })
+    .catch(error => {
+        console.error('Error obteniendo el token:', error);
+    });
+}
+
+// *** NUEVO *** AJAX GET para obtener todas las reservas
+document.getElementById("getReservas").onclick = function(){
+    getToken()
+    .then(token => {
+        if (!token) {
+            console.error('No token available');
+            return;
+        }
+
+        $.ajax({
+            url: API_ENDPOINT + "/reservasCanchas",
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            headers: {
+                'Authorization': token  // Utiliza el token almacenado
+            },
+            success: function (response) {
+                $('#reservasTable tr').slice(1).remove();
+                jQuery.each(response, function(i, data) {          
+                    $("#reservasTable").append("<tr> \
+                        <td>" + data['Fecha'] + "</td> \
+                        <td>" + data['Espacio'] + "</td> \
+                        <td>" + data['Horario'] + "</td> \
+                        </tr>");
+                });
+            },
+            error: function () {
+                alert("Error al obtener las reservas.");
+            }
+        });
+    })
+    .catch(error => {
+        console.error('Error obteniendo el token:', error);
+    });      
+}
+

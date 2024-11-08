@@ -18,10 +18,21 @@ variable "get_lambda_uri" {
   type        = string
 }
 
+variable "getReservas_lambda_uri" {
+  description = "URI de la función Lambda para el método GET"
+  type        = string
+}
+
 variable "post_lambda_uri" {
   description = "URI de la función Lambda para el método POST"
   type        = string
 }
+
+variable "postReservas_lambda_uri" {
+  description = "URI de la función Lambda para el método POST"
+  type        = string
+}
+
 
 variable "redirect_lambda_uri" {
   description = "URI de la función Lambda para el método redirect"
@@ -38,7 +49,17 @@ variable "get_lambda_function_name" {
   type        = string
 }
 
+variable "getReservas_lambda_function_name" {
+  description = "Nombre de la función Lambda para el método GET"
+  type        = string
+}
+
 variable "post_lambda_function_name" {
+  description = "Nombre de la función Lambda para el método POST"
+  type        = string
+}
+
+variable "postReservas_lambda_function_name" {
   description = "Nombre de la función Lambda para el método POST"
   type        = string
 }

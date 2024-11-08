@@ -38,7 +38,7 @@ jsonFile="terraform_outputs.json"
 
 # Lee el archivo JSON
 jsonData=$(cat $jsonFile)
-API_ENDPOINT=$(echo $jsonData | jq -r '.invoke_url.value')"/quejasVecinos"
+API_ENDPOINT=$(echo $jsonData | jq -r '.invoke_url.value')
 REDIRECT_URL=$(echo $jsonData | jq -r '.invoke_url.value')"/redirectBucket"
 userPoolId=$(echo $jsonData | jq -r '.user_pool_id.value')
 bucketLink=$(echo $jsonData | jq -r '.website_url.value')

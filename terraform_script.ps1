@@ -42,7 +42,7 @@ $jsonFile = "terraform_outputs.json"
 
 # Lee el archivo JSON
 $jsonData = Get-Content -Path $jsonFile | ConvertFrom-Json
-$API_ENDPOINT = $jsonData.invoke_url.value + "/quejasVecinos"
+$API_ENDPOINT = $jsonData.invoke_url.value
 $REDIRECT_URL = $jsonData.invoke_url.value + "/redirectBucket"
 $userPoolId = $jsonData.user_pool_id.value
 $bucketLink = $jsonData.website_url.value
