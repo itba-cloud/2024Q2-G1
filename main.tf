@@ -13,7 +13,7 @@ module "vpc_interno" {
 
 module "dynamoQuejas" {
   source        = "./modules/dynamo"
-  table_name    = "quejasVecinosTerra"
+  table_name    = "quejasVecinos"
   hash_key      = "pk_urg"
   range_key     = "sk_tipo_id"
   read_capacity = 1
@@ -47,7 +47,7 @@ resource "aws_dynamodb_table_item" "queja_jardineria" {
 
 module "dynamoReservas" {
   source        = "./modules/dynamo"
-  table_name    = "ReservasVecinosTerra"
+  table_name    = "reservasVecinos"
   hash_key      = "pk_fecha"
   range_key     = "sk_espacio_reserva"
   read_capacity = 1
@@ -116,7 +116,7 @@ resource "aws_security_group" "lambda_sg" {
 }
 
 resource "aws_lambda_function" "get_denuncia" {
-  function_name = "getDenunciaTerraform"
+  function_name = "getDenuncia"
   role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
   handler       = "getDenuncia.lambda_handler"
   runtime       = "python3.11"
@@ -133,7 +133,7 @@ resource "aws_lambda_function" "get_denuncia" {
 }
 
 resource "aws_lambda_function" "post_denuncia" {
-  function_name = "postDenunciaTerraform"
+  function_name = "postDenuncia"
   role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
   handler       = "postDenuncia.lambda_handler"
   runtime       = "python3.11"
@@ -199,7 +199,7 @@ resource "aws_lambda_function" "redirect" {
 
 module "api_gateway" {
   source                     = "./modules/apigateway"
-  api_name                   = "quejasVecinosTerraform2"
+  api_name                   = "apiVecinos"
   api_description            = "API de Terraform para quejas de vecinos"
   cognito_authorizer_id      = module.cognito.authorizer_id
   get_lambda_uri             = aws_lambda_function.get_denuncia.invoke_arn
@@ -218,7 +218,7 @@ module "api_gateway" {
 module "s3_static_site" {
   source           = "./modules/static_site"  # Ruta hacia el módulo
   nombre_bucket    = var.nombre_bucket   # Variable que ya debería estar definida
-  bucket_name_tag  = "TP Cloud Estatico" # Puedes cambiar estos valores si necesitas
+  bucket_name_tag  = "Front sistema vecinos" # Puedes cambiar estos valores si necesitas
   environment_tag  = "Prod"
 }
 

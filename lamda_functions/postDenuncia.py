@@ -5,7 +5,7 @@ from datetime import datetime
 
 # Inicializa el cliente de DynamoDB
 dynamodb = boto3.resource('dynamodb')
-table_name = 'quejasVecinosTerra'
+table_name = 'quejasVecinos'
 table = dynamodb.Table(table_name)
 
 def lambda_handler(event, context):

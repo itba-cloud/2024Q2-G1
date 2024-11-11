@@ -5,7 +5,7 @@ import uuid
 
 # Conectar a DynamoDB
 dynamodb = boto3.resource('dynamodb')
-table_name = 'ReservasVecinosTerra'
+table_name = 'reservasVecinos'
 table = dynamodb.Table(table_name)
 
 # Lambda handler unificado
