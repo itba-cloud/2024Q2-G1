@@ -24,7 +24,11 @@ resource "aws_cognito_user_pool" "user_pool" {
     email_subject        = var.verification_email_subject
     email_message        = var.verification_email_message
   }
-}
+
+  lambda_config {
+    post_confirmation = var.lambda_subscribe_sns
+  }
+} 
 
 resource "aws_cognito_user_pool_client" "user_pool_client" {
   user_pool_id = aws_cognito_user_pool.user_pool.id

@@ -47,3 +47,8 @@ variable "account_id" {
   description = "ID de la cuenta de AWS"
   type        = string
 }
+
+variable "lambda_subscribe_sns" {
+  description = "lambda que suscribe al sns"
+  type        = string
+}

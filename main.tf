@@ -23,7 +23,6 @@ module "dynamoQuejas" {
   }
 }
 
-
 #Agregar un registro a la DynamoDB
 resource "aws_dynamodb_table_item" "queja_jardineria" {
   table_name = module.dynamoQuejas.table_name
@@ -59,18 +58,33 @@ module "dynamoReservas" {
 }
 
 module "alerta_dynamo" {
+  sns_name               = "sns_dynamo_admin"
   source                 = "./modules/alerta_dynamo"
   email_endpoint         = var.mail_admin
-  lambda_name            = "dynamoStreamSNS"
+  lambda_name            = "quejasSNS"
   lambda_role_arn        = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
-  lambda_filename        = "output_lambda_functions/dynamoStreamSNS_src.zip"
-  lambda_source_code_hash = data.archive_file.dynamoStreamSNS_code.output_base64sha256
+  lambda_filename        = "output_lambda_functions/quejasSNS_src.zip"
+  lambda_source_code_hash = data.archive_file.quejasSNS_code.output_base64sha256
   dynamo_stream_arn      = module.dynamoQuejas.stream_arn
+  lambda_handler = "quejasSNS.lambda_handler"
+  otro_sns_arn = module.alerta_dynamo_reservas.sns_topic_arn
+}
+
+module "alerta_dynamo_reservas" {
+  sns_name               = "sns_dynamo_general"
+  source                 = "./modules/alerta_dynamo"
+  email_endpoint         = var.mail_admin
+  lambda_name            = "reservasSNS"
+  lambda_role_arn        = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
+  lambda_filename        = "output_lambda_functions/reservasSNS_src.zip"
+  lambda_source_code_hash = data.archive_file.reservasSNS_code.output_base64sha256
+  dynamo_stream_arn      = module.dynamoReservas.stream_arn
+  lambda_handler = "reservasSNS.lambda_handler"
 }
 
 module "cognito" {
   source                  = "./modules/cognito"
-  user_pool_name          = "user-pool-plataforma-vecinos"
+  user_pool_name          = "nombreuserpoolrandom"
   verification_email_subject = "Verifica tu cuenta en Sistema Quejas Vecinos"
   verification_email_message = "Gracias por registrarte. Para verificar tu cuenta, usa este código: {####}."
   user_pool_client_name   = "cliente-user-pool-plataforma"
@@ -80,8 +94,9 @@ module "cognito" {
   api_gateway_rest_api_id = module.api_gateway.api_id
   region                  = "us-east-1"  # o la región que necesites
   account_id              = data.aws_caller_identity.current.account_id
+  lambda_subscribe_sns =  aws_lambda_function.subscribe_user_to_sns.arn
 }
-
+ 
 resource "aws_security_group" "lambda_sg" {
   name        = "Lambda-sg-Terra"
   description = "SG hecho en terra para las lambdas"
@@ -213,4 +228,27 @@ resource "aws_s3_object" "index_html" {
   key    = "index.html"
   source = "web/index.html"  # Ruta local del archivo
   content_type = "text/html"
+}
+
+resource "aws_lambda_function" "subscribe_user_to_sns" {
+  filename         = "output_lambda_functions/lambda_subscribeSNS_src.zip"  # Cambia este archivo por el código comprimido de tu Lambda
+  function_name    = "sns_subscribe"
+  handler          = "subscribeSNS.lambda_handler"
+  runtime          = "python3.9"
+  role             = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
+  source_code_hash =  data.archive_file.subscribeSNS_code.output_base64sha256
+
+  environment {
+    variables = {
+      SNS_TOPIC_ARN_SUB = module.alerta_dynamo_reservas.sns_topic_arn
+    }
+  }
+}
+
+resource "aws_lambda_permission" "allow_cognito_invoke" {
+  statement_id  = "AllowCognitoInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.subscribe_user_to_sns.function_name
+  principal     = "cognito-idp.amazonaws.com"
+  source_arn    = module.cognito.user_pool_arn
 }

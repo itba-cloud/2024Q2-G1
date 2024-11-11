@@ -18,10 +18,16 @@ data "archive_file" "redirect_code" {
     output_path = "output_lambda_functions/lambda_redirect_src.zip"
 }
 
-data "archive_file" "dynamoStreamSNS_code" {
+data "archive_file" "quejasSNS_code" {
     type = "zip"
-    source_file = "lamda_functions/dynamoStreamSNS.py"
-    output_path = "output_lambda_functions/dynamoStreamSNS_src.zip"
+    source_file = "lamda_functions/quejasSNS.py"
+    output_path = "output_lambda_functions/quejasSNS_src.zip"
+}
+
+data "archive_file" "reservasSNS_code" {
+    type = "zip"
+    source_file = "lamda_functions/reservasSNS.py"
+    output_path = "output_lambda_functions/reservasSNS_src.zip"
 }
 
 data "archive_file" "addReserva_code" {
@@ -38,4 +44,10 @@ data "archive_file" "getReserva_code" {
 
 data "aws_availability_zones" "available" {
   state = "available"
+}
+
+data "archive_file" "subscribeSNS_code" {
+    type = "zip"
+    source_file = "lamda_functions/subscribeSNS.py"
+    output_path = "output_lambda_functions/lambda_subscribeSNS_src.zip"
 }

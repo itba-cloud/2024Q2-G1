@@ -3,6 +3,16 @@ variable "email_endpoint" {
   type        = string
 }
 
+variable "sns_name" {
+  description = "nombre del sns"
+  type        = string
+}
+
+variable "lambda_handler" {
+  description = "lambda handler"
+  type        = string
+}
+
 variable "lambda_name" {
   description = "Nombre de la función Lambda"
   type        = string
@@ -26,4 +36,10 @@ variable "lambda_source_code_hash" {
 variable "dynamo_stream_arn" {
   description = "ARN del stream de la tabla DynamoDB"
   type        = string
+}
+
+variable "otro_sns_arn" {
+  description = "otro sns"
+  type        = string
+  default = ""
 }

@@ -1,17 +1,23 @@
 resource "aws_sns_topic" "email_topic" {
-  name = "dynamodb_updates_email_topic"
+  name = var.sns_name
 }
 
 resource "aws_sns_topic_subscription" "email_subscription" {
-  topic_arn = aws_sns_topic.email_topic.arn
-  protocol  = "email"
-  endpoint  = var.email_endpoint  # Parámetro para el email destinatario
+  topic_arn    = aws_sns_topic.email_topic.arn
+  protocol     = "email"
+  endpoint     = var.email_endpoint  # Parámetro para el email destinatario
+
+  # Agrega la política de filtro
+  filter_policy = jsonencode({
+    userName = [var.email_endpoint]  # Reemplaza con el nombre y valor de tu atributo
+  })
 }
+
 
 resource "aws_lambda_function" "dynamodb_stream_lambda" {
   function_name = var.lambda_name
   role          = var.lambda_role_arn
-  handler       = "dynamoStreamSNS.lambda_handler"
+  handler       = var.lambda_handler
   runtime       = "python3.11"
   timeout       = 60
   memory_size   = 128
@@ -21,6 +27,8 @@ resource "aws_lambda_function" "dynamodb_stream_lambda" {
   environment {
     variables = {
       SNS_TOPIC_ARN = aws_sns_topic.email_topic.arn
+      OTRO_SNS = var.otro_sns_arn
+      ADMIN_MAIL = var.email_endpoint
     }
   }
 }

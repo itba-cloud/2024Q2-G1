@@ -7,6 +7,12 @@ sns_client = boto3.client('sns')
 
 # ARN del tema de SNS al que deseas enviar la información
 SNS_TOPIC_ARN  = os.environ['SNS_TOPIC_ARN']
+OTRO_SNS_TOPIC_ARN  = os.environ['OTRO_SNS']
+MAIL_ADMIN = os.environ['ADMIN_MAIL']
+
+print(SNS_TOPIC_ARN)
+print(OTRO_SNS_TOPIC_ARN)
+print(MAIL_ADMIN)
 
 def lambda_handler(event, context):
     for record in event['Records']:
@@ -18,6 +24,7 @@ def lambda_handler(event, context):
             titulo = record['dynamodb']['NewImage'].get('titulo', {}).get('S', 'N/A')
             detalle = record['dynamodb']['NewImage'].get('detalle', {}).get('S', 'N/A')
             fecha = record['dynamodb']['NewImage'].get('fecha', {}).get('S', 'N/A')
+            email = record['dynamodb']['NewImage'].get('mail', {}).get('S', 'N/A')
             nombre_propietario = record['dynamodb']['NewImage'].get('nombre_propietario', {}).get('S', 'N/A')
             
             # Crea el mensaje para SNS
@@ -30,13 +37,32 @@ def lambda_handler(event, context):
                 'Propietario': nombre_propietario
             }
             
-            # Envía el mensaje a SNS
+            # Envía el mensaje al admin si es urgencia alta
             if urgencia == 'ALTA':
+                message_attributes_admin = {}
+                message_attributes_admin['userName'] = {
+                    'DataType': 'String',
+                    "StringValue": MAIL_ADMIN
+                }
                 sns_client.publish(
                     TopicArn=SNS_TOPIC_ARN,
                     Message=json.dumps(message),
-                    Subject='RECLAMO VECINOS - URGENTE'
+                    Subject='RECLAMO VECINOS - URGENTE',
+                    MessageAttributes=message_attributes_admin
                 )
+            
+            # Envía el mensaje a SNS
+            message_attributes = {}
+            message_attributes['userName'] = {
+                'DataType': 'String',
+                "StringValue": email
+             }
+            sns_client.publish(
+                TopicArn= OTRO_SNS_TOPIC_ARN,
+                Message=json.dumps(message),
+                Subject='RECLAMO REGISTRADO',
+                MessageAttributes=message_attributes
+            )
     
     return {
         'statusCode': 200,

@@ -17,6 +17,9 @@ def lambda_handler(event, context):
     fecha = body['fecha']
     espacio = body['espacio']
     horario = body['horario']
+
+    # Obtener el email del usuario desde el token de identidad de Cognito
+    email_usuario = event['requestContext']['authorizer']['claims']['email']
     
     # Convertir el horario a un objeto de tiempo
     horario_inicial = datetime.strptime(horario, '%H:%M')
@@ -58,7 +61,8 @@ def lambda_handler(event, context):
         'ReservaID': reserva_id,
         'Fecha': fecha,
         'Espacio': espacio,
-        'Horario': horario
+        'Horario': horario,
+        'email': email_usuario
     }
     
     table.put_item(Item=reserva_data)
