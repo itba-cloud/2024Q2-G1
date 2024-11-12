@@ -66,35 +66,76 @@ document.getElementById("savecomplaint").onclick = function() {
             console.error('No token available');
             return;
         }
-        
-        var inputData = {
-            "urgencia": $('#urgencia').val(),
-            "tipo": $('#tipo').val(),
-            "nombre_propietario": $('#nombre_propietario').val(),
-            "titulo": $('#titulo').val(),
-            "detalle": $('#detalle').val()
-        };
 
-        $.ajax({
-            url: API_ENDPOINT+ "/quejasVecinos",
-            type: 'POST',
-            data: JSON.stringify(inputData),
-            contentType: 'application/json; charset=utf-8',
-            headers: {
-                'Authorization': token  // Incluye el token de autorización
-            },
-            success: function (response) {
+        const imageFile = document.getElementById('imagen').files[0]; // Obtén el archivo de imagen del input
+
+        // Verifica si hay un archivo de imagen seleccionado y no está vacío
+        if (imageFile && imageFile.size > 0) {
+            // Paso 1: Solicita la URL presignada desde la Lambda
+            fetch(API_ENDPOINT + "/subirImagen", {
+                method: 'GET',
+                headers: {
+                    'Authorization': token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const presignedUrl = data.presigned_url;
+                const imageUrl = presignedUrl.split('?')[0]; // Extrae la URL base sin los parámetros de firma
+                
+                // Paso 2: Sube la imagen usando la URL presignada
+                return fetch(presignedUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': imageFile.type  // Define el tipo de contenido basado en el archivo
+                    },
+                    body: imageFile
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Error al subir la imagen");
+                    }
+                    return imageUrl;  // Devuelve la URL de la imagen
+                });
+            })
+            .then(imageUrl => {
+                // Paso 3: Añade el link de la imagen al inputData
+                var inputData = {
+                    "urgencia": $('#urgencia').val(),
+                    "tipo": $('#tipo').val(),
+                    "nombre_propietario": $('#nombre_propietario').val(),
+                    "titulo": $('#titulo').val(),
+                    "detalle": $('#detalle').val(),
+                    "imagen_url": imageUrl  // Guarda la URL de la imagen
+                };
+
+                // Paso 4: Envía los datos de la queja con la URL de la imagen
+                return $.ajax({
+                    url: API_ENDPOINT + "/quejasVecinos",
+                    type: 'POST',
+                    data: JSON.stringify(inputData),
+                    contentType: 'application/json; charset=utf-8',
+                    headers: {
+                        'Authorization': token
+                    }
+                });
+            })
+            .then(() => {
                 document.getElementById("complaintSaved").innerHTML = "Funcionó";
-            },
-            error: function () {
-                alert("F. No funcionó");
-            }
-        });
+            })
+            .catch(error => {
+                console.error('Error al subir la imagen o guardar la queja:', error);
+                alert("No funcionó");
+            });
+        } else {
+            console.log("No se seleccionó ninguna imagen o el archivo está vacío");
+            alert("Por favor, selecciona una imagen válida para subir.");
+        }
     })
     .catch(error => {
         console.error('Error obteniendo el token:', error);
     });
-}
+};
 
 // AJAX GET request to retrieve all students
 document.getElementById("getstudents").onclick = function(){
@@ -123,6 +164,7 @@ document.getElementById("getstudents").onclick = function(){
                         <td>" + data['titulo'] + "</td> \
                         <td>" + data['detalle'] + "</td> \
                         <td>" + data['estado'] + "</td> \
+                        <td><a href='" + data['imagen'] + "' target='_blank'>Ver imagen</a></td> \
                         </tr>");
                 });
             },

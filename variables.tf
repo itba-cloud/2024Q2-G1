@@ -13,6 +13,11 @@ variable "nombre_cognito" {
   type = string
 }
 
+variable "bucket_imagenes" {
+  description = "nombre del bucket de imagenes"
+  type = string
+}
+
 variable "nombre_bucket" {
   description = "nombre del bucket"
   type = string

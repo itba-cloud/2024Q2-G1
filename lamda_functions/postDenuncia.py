@@ -19,6 +19,7 @@ def lambda_handler(event, context):
         nombre_propietario = body['nombre_propietario']
         titulo = body['titulo']
         detalle = body['detalle']        
+        imagen = body['imagen_url']    
 
         # Obtener el email del usuario desde el token de identidad de Cognito
         email_usuario = event['requestContext']['authorizer']['claims']['email']
@@ -44,7 +45,8 @@ def lambda_handler(event, context):
             'titulo': titulo,
             'detalle': detalle,
             'estado': estado,
-            'mail': email_usuario
+            'mail': email_usuario,
+            'imagen': imagen
         }
         
         # Insertar el ítem en la tabla DynamoDB

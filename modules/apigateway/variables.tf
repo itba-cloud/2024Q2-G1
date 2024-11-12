@@ -18,6 +18,11 @@ variable "get_lambda_uri" {
   type        = string
 }
 
+variable "getImagen_lambda_uri" {
+  description = "URI de la función Lambda para el método GET de la imagen"
+  type        = string
+}
+
 variable "getReservas_lambda_uri" {
   description = "URI de la función Lambda para el método GET"
   type        = string
@@ -45,6 +50,11 @@ variable "stage_name" {
 }
 
 variable "get_lambda_function_name" {
+  description = "Nombre de la función Lambda para el método GET"
+  type        = string
+}
+
+variable "getImagen_lambda_function_name" {
   description = "Nombre de la función Lambda para el método GET"
   type        = string
 }

@@ -180,6 +180,23 @@ resource "aws_lambda_function" "get_reserva" {
   }
 }
 
+resource "aws_lambda_function" "presigned_url" {
+  function_name = "presignedUrl"
+  role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
+  handler       = "presignedUrl.lambda_handler"
+  runtime       = "python3.11"
+  timeout       = 60
+  memory_size   = 128
+  filename = "output_lambda_functions/lambda_presignedUrl_src.zip"
+  source_code_hash = data.archive_file.presignedUrl_code.output_base64sha256
+  depends_on = [ module.vpc_interno ]
+  environment {
+    variables = {
+      BUCKET_NAME = module.s3_bucket_presigned.bucket_bucket
+    }
+  } 
+}
+
 resource "aws_lambda_function" "redirect" {
   function_name = "redirect"
   role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
@@ -202,11 +219,13 @@ module "api_gateway" {
   api_name                   = "apiVecinos"
   api_description            = "API de Terraform para quejas de vecinos"
   cognito_authorizer_id      = module.cognito.authorizer_id
+  getImagen_lambda_uri       = aws_lambda_function.presigned_url.invoke_arn
   get_lambda_uri             = aws_lambda_function.get_denuncia.invoke_arn
   getReservas_lambda_uri     = aws_lambda_function.get_reserva.invoke_arn
   post_lambda_uri            = aws_lambda_function.post_denuncia.invoke_arn
   postReservas_lambda_uri    = aws_lambda_function.add_reserva.invoke_arn
   redirect_lambda_uri        = aws_lambda_function.redirect.invoke_arn
+  getImagen_lambda_function_name = aws_lambda_function.presigned_url.function_name
   get_lambda_function_name   = aws_lambda_function.get_denuncia.function_name
   getReservas_lambda_function_name   = aws_lambda_function.get_reserva.function_name
   post_lambda_function_name  = aws_lambda_function.post_denuncia.function_name
@@ -230,6 +249,7 @@ resource "aws_s3_object" "index_html" {
   content_type = "text/html"
 }
 
+
 resource "aws_lambda_function" "subscribe_user_to_sns" {
   filename         = "output_lambda_functions/lambda_subscribeSNS_src.zip"  # Cambia este archivo por el código comprimido de tu Lambda
   function_name    = "sns_subscribe"
@@ -251,4 +271,9 @@ resource "aws_lambda_permission" "allow_cognito_invoke" {
   function_name = aws_lambda_function.subscribe_user_to_sns.function_name
   principal     = "cognito-idp.amazonaws.com"
   source_arn    = module.cognito.user_pool_arn
+}
+
+module "s3_bucket_presigned" {
+  source      = "./modules/s3_bucket_presigned"
+  bucket_name = var.bucket_imagenes
 }

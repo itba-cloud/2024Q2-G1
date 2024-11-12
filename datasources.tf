@@ -42,6 +42,12 @@ data "archive_file" "getReserva_code" {
     output_path = "output_lambda_functions/lambda_getReserva_src.zip"
 }
 
+data "archive_file" "presignedUrl_code" {
+    type = "zip"
+    source_file = "lamda_functions/presignedUrl.py"
+    output_path = "output_lambda_functions/lambda_presignedUrl_src.zip"
+}
+
 data "aws_availability_zones" "available" {
   state = "available"
 }
