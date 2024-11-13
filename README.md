@@ -3,8 +3,7 @@
 Este proyecto tiene como objetivo lanzar una infraestructura en AWS utilizando Terraform y otros componentes como API Gateway, Lambdas y Cognito. A continuación, se detallan los pasos para desplegar y acceder a los recursos creados.
 
 ## Arquitectura
-
-<img width="576" alt="Screenshot 2024-10-23 at 12 43 00" src="https://github.com/user-attachments/assets/611e266a-cc98-4759-9338-6c2f9d3f26e5">
+<img width="576" src="https://github.com/user-attachments/assets/87f13efa-a9ea-412a-af1e-c7f274e58b74">
 
 ## Requisitos
 
@@ -22,13 +21,13 @@ Para iniciar el despliegue de la infraestructura, sigue estos pasos:
 1. **Clonar el repositorio:**
    
    ```bash
-   git clone https://github.com/FedeAbancensITBA/TP-Terraform.git
+   git clone https://github.com/FedeAbancensITBA/2024Q2-G1.git
    ```
 
    Si todavía no fue aceptado el pull request deberán clonar la rama llamada "rama-entrega"
    
     ```bash
-   git clone -b rama-entrega https://github.com/FedeAbancensITBA/TP-Terraform.git
+   git clone -b rama-entrega https://github.com/FedeAbancensITBA/2024Q2-G1.git
    ```
     
 3. **Entrar a la carpeta que descarga del repositorio**
