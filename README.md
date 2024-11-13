@@ -108,4 +108,9 @@ Una vez que el script haya finalizado, verás un conjunto de outputs generados p
 
 Este URL es el enlace para acceder a la interfaz alojada de Cognito. Simplemente copia el link y pégalo en tu navegador para acceder.
 
+## Destruir la infraestructura
 
+Para eliminar toda la infraestructura se debe ejecutar el siguiente código
+
+```bash
+   terraform destroy
