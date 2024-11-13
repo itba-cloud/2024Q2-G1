@@ -24,5 +24,5 @@ output "subnet_ids" {
 #}
 
 output "route_table_ids" {
-  value = aws_route_table.example.*.id  # Reemplaza `aws_route_table.example` por tu recurso de tabla de rutas
+  value = aws_route_table.example.*.id
 }
