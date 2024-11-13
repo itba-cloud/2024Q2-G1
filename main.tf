@@ -57,6 +57,18 @@ module "dynamoReservas" {
   }
 }
 
+module "dynamoEntradas" {
+  source        = "./modules/dynamo"
+  table_name    = "entradasVisitantes"
+  hash_key      = "pk"
+  range_key     = "sk"
+  read_capacity = 1
+  write_capacity = 1
+  tags          = {
+    Name = "DynamoEntradasVisitantes"
+  }
+}
+
 module "alerta_dynamo" {
   sns_name               = "sns_dynamo_admin"
   source                 = "./modules/alerta_dynamo"
@@ -148,6 +160,39 @@ resource "aws_lambda_function" "post_denuncia" {
   }
 }
 
+resource "aws_lambda_function" "get_entrada" {
+  function_name = "getEntrada"
+  role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
+  handler       = "getEntrada.lambda_handler"
+  runtime       = "python3.11"
+  timeout       = 60
+  memory_size   = 128
+  filename = "output_lambda_functions/lambda_getEntrada_src.zip"
+  source_code_hash = data.archive_file.get_entrada_code.output_base64sha256
+  depends_on = [ module.vpc_interno ]
+
+  vpc_config {
+    subnet_ids         = flatten([module.vpc_interno.subnet_ids])
+    security_group_ids = [aws_security_group.lambda_sg.id]
+  }
+}
+
+resource "aws_lambda_function" "post_entrada" {
+  function_name = "postEntrada"
+  role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
+  handler       = "postEntrada.lambda_handler"
+  runtime       = "python3.11"
+  timeout       = 60
+  memory_size   = 128
+  filename = "output_lambda_functions/lambda_postEntrada_src.zip"
+  source_code_hash = data.archive_file.post_entrada_code.output_base64sha256
+  depends_on = [ module.vpc_interno ]
+  vpc_config {
+    subnet_ids         = flatten([module.vpc_interno.subnet_ids])
+    security_group_ids = [aws_security_group.lambda_sg.id]
+  }
+}
+
 resource "aws_lambda_function" "add_reserva" {
   function_name = "addReserva"
   role          = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
@@ -221,15 +266,19 @@ module "api_gateway" {
   cognito_authorizer_id      = module.cognito.authorizer_id
   getImagen_lambda_uri       = aws_lambda_function.presigned_url.invoke_arn
   get_lambda_uri             = aws_lambda_function.get_denuncia.invoke_arn
+  getEntrada_lambda_uri       = aws_lambda_function.get_entrada.invoke_arn
+  postEntrada_lambda_uri =  aws_lambda_function.post_entrada.invoke_arn
   getReservas_lambda_uri     = aws_lambda_function.get_reserva.invoke_arn
   post_lambda_uri            = aws_lambda_function.post_denuncia.invoke_arn
   postReservas_lambda_uri    = aws_lambda_function.add_reserva.invoke_arn
   redirect_lambda_uri        = aws_lambda_function.redirect.invoke_arn
   getImagen_lambda_function_name = aws_lambda_function.presigned_url.function_name
+  getEntrada_lambda_function_name = aws_lambda_function.get_entrada.function_name
   get_lambda_function_name   = aws_lambda_function.get_denuncia.function_name
   getReservas_lambda_function_name   = aws_lambda_function.get_reserva.function_name
   post_lambda_function_name  = aws_lambda_function.post_denuncia.function_name
   postReservas_lambda_function_name  = aws_lambda_function.add_reserva.function_name
+  postEntrada_lambda_function_name = aws_lambda_function.post_entrada.function_name
   redirect_lambda_function_name = aws_lambda_function.redirect.function_name
   stage_name                 = "prod"
 }
@@ -241,14 +290,29 @@ module "s3_static_site" {
   environment_tag  = "Prod"
 }
 
-# Subir el archivo index.html
-resource "aws_s3_object" "index_html" {
+module "s3_static_site_formulario" {
+  source           = "./modules/static_site"  # Ruta hacia el módulo
+  nombre_bucket    = var.nombre_bucket_formulario   # Variable que ya debería estar definida
+  bucket_name_tag  = "Front formulario visitas" # Puedes cambiar estos valores si necesitas
+  environment_tag  = "Prod"
+}
+
+
+# Subir el archivo index.html del sistema
+resource "aws_s3_object" "index_html_formulario" {
   bucket = module.s3_static_site.bucket_name
   key    = "index.html"
   source = "web/index.html"  # Ruta local del archivo
   content_type = "text/html"
 }
 
+# Subir el archivo index.html del formulario de visitas
+resource "aws_s3_object" "index_html" {
+  bucket = module.s3_static_site_formulario.bucket_name
+  key    = "index.html"
+  source = "web_formulario/index.html"  # Ruta local del archivo
+  content_type = "text/html"
+}
 
 resource "aws_lambda_function" "subscribe_user_to_sns" {
   filename         = "output_lambda_functions/lambda_subscribeSNS_src.zip"  # Cambia este archivo por el código comprimido de tu Lambda

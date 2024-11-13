@@ -36,6 +36,9 @@ outputFile="web/scripts.js"
 inputFile="web/base_scripts.js"
 jsonFile="terraform_outputs.json"
 
+outputFile2="web_formulario/scripts.js"
+inputFile2="web_formulario/base_scripts.js"
+
 # Lee el archivo JSON
 jsonData=$(cat $jsonFile)
 API_ENDPOINT=$(echo $jsonData | jq -r '.invoke_url.value')
@@ -64,6 +67,16 @@ $fileContent"
 # Sobrescribir el archivo scripts.js con el nuevo contenido
 echo "$newContent" > $outputFile
 
+# Leer el contenido actual del archivo base_scripts.js
+fileContent2=$(cat $inputFile2)
+
+# Concatenar las nuevas variables al inicio del contenido del archivo
+newContent2="$variables2
+$fileContent2"
+
+# Sobrescribir el archivo scripts.js con el nuevo contenido
+echo "$newContent2" > $outputFile2
+
 # Mensaje de confirmación
 echo "Variables agregadas exitosamente al inicio del archivo scripts.js."
 
@@ -76,6 +89,14 @@ resource "aws_s3_object" "scripts_js" {
   bucket = module.s3_static_site.bucket_name
   key    = "scripts.js"
   source = "web/scripts.js"  # Ruta local del archivo
+  content_type = "application/javascript"
+}
+
+# Subir el archivo scripts.js
+resource "aws_s3_object" "scripts_js_formulario" {
+  bucket = module.s3_static_site_formulario.bucket_name
+  key    = "scripts.js"
+  source = "web_formulario/scripts.js"  # Ruta local del archivo
   content_type = "application/javascript"
 }
 EOF
@@ -105,6 +126,14 @@ if [ -f $outputFile ]; then
     echo "Archivo $outputFile eliminado exitosamente."
 else
     echo "El archivo $outputFile no existe."
+fi
+
+# Verificar si el archivo scripts.js existe y eliminarlo
+if [ -f $outputFile2 ]; then
+    rm $outputFile2
+    echo "Archivo $outputFile2 eliminado exitosamente."
+else
+    echo "El archivo $outputFile2 no existe."
 fi
 
 # Verificar si el archivo subir_script.tf existe y eliminarlo

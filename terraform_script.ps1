@@ -40,6 +40,9 @@ $outputFile = "web/scripts.js"
 $inputFile = "web/base_scripts.js"
 $jsonFile = "terraform_outputs.json"
 
+$outputFile2 = "web_formulario/scripts.js"
+$inputFile2 = "web_formulario/base_scripts.js"
+
 # Lee el archivo JSON
 $jsonData = Get-Content -Path $jsonFile | ConvertFrom-Json
 $API_ENDPOINT = $jsonData.invoke_url.value
@@ -66,6 +69,16 @@ $newContent = $variables + "`n" + $fileContent
 # Sobrescribir el archivo scripts.js con el nuevo contenido
 $newContent | Out-File -FilePath $outputFile -Encoding UTF8
 
+# Leer el contenido actual del archivo base_scripts.js
+$fileContent2 = Get-Content -Path $inputFile2 -Raw
+
+# Concatenar las nuevas variables al inicio del contenido del archivo
+$newContent2 = $variables + "`n" + $fileContent2
+
+# Sobrescribir el archivo scripts.js con el nuevo contenido
+$newContent2 | Out-File -FilePath $outputFile2 -Encoding UTF8
+
+
 # Mensaje de confirmación
 Write-Output "Variables agregadas exitosamente al inicio del archivo scripts.js."
 
@@ -78,6 +91,13 @@ resource "aws_s3_object" "scripts_js" {
   bucket = module.s3_static_site.bucket_name
   key    = "scripts.js"
   source = "web/scripts.js"  # Ruta local del archivo
+  content_type = "application/javascript"
+}
+
+resource "aws_s3_object" "scripts_js_2" {
+  bucket = module.s3_static_site_formulario.bucket_name
+  key    = "scripts.js"
+  source = "web_formulario/scripts.js"  # Ruta local del archivo
   content_type = "application/javascript"
 }
 "@
@@ -106,6 +126,14 @@ if (Test-Path -Path $outputFile) {
     Write-Output "Archivo $outputFile eliminado exitosamente."
 } else {
     Write-Output "El archivo $outputFile no existe."
+}
+
+# Verificar si el archivo scripts.js existe y eliminarlo
+if (Test-Path -Path $outputFile2) {
+    Remove-Item -Path $outputFile2
+    Write-Output "Archivo $outputFile2 eliminado exitosamente."
+} else {
+    Write-Output "El archivo $outputFile2 no existe."
 }
 
 # Verificar si el archivo subir_script.tf existe y eliminarlo

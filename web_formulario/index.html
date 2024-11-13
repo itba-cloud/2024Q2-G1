@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autorización de Ingreso</title>
+    <style>
+        body {
+            background-color: #f0f0f0;
+            color: #333;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color: #007bff;
+            text-align: center;
+        }
+        .container {
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin: 10px 0 5px 0;
+        }
+        input[type="text"], input[type="email"], input[type="date"], input[type="time"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Autorización de Ingreso de Visitantes</h1>
+        <form id="visitorForm">
+            <label for="nombreVisitante">Nombre del Visitante:</label>
+            <input type="text" id="nombreVisitante" name="nombreVisitante" required>
+
+            <label for="apellidoVisitante">Apellido del Visitante:</label>
+            <input type="text" id="apellidoVisitante" name="apellidoVisitante" required>
+
+            <label for="documentoVisitante">Documento del Visitante:</label>
+            <input type="text" id="documentoVisitante" name="documentoVisitante" required>
+
+            <label for="fechaIngreso">Fecha de Ingreso:</label>
+            <input type="date" id="fechaIngreso" name="fechaIngreso" required>
+
+            <label for="horaIngreso">Hora de Ingreso:</label>
+            <input type="time" id="horaIngreso" name="horaIngreso" required>
+
+            <label for="emailPropietario">Email del Propietario:</label>
+            <input type="email" id="emailPropietario" name="emailPropietario" required>
+
+            <input type="submit" value="Solicitar Autorización">
+            <p id="autorizacionMensaje"></p>
+        </form>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aws-amplify/3.3.27/aws-amplify.min.js"></script>
+    <script src="scripts.js"></script>
+</body>
+</html>

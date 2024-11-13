@@ -23,6 +23,11 @@ variable "nombre_bucket" {
   type = string
 }
 
+variable "nombre_bucket_formulario" {
+  description = "nombre del bucket"
+  type = string
+}
+
 variable "mail_admin" {
   description = "Mail del admin que recibe las alertas"
   type = string

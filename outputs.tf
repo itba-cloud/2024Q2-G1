@@ -4,6 +4,12 @@ output "invoke_url" {
 }
 
 # Output para obtener la URL del sitio web estático
+output "website_url_formulario" {
+  value       = module.s3_static_site_formulario.bucket_website_endpoint
+  description = "URL del sitio web estático"
+}
+
+# Output para obtener la URL del sitio web estático
 output "website_url" {
   value       = module.s3_static_site.bucket_website_endpoint
   description = "URL del sitio web estático"

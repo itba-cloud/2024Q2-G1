@@ -140,6 +140,7 @@
         <div class="tabs">
             <button class="tab active" onclick="showTab('quejas')">Quejas</button>
             <button class="tab" onclick="showTab('reservas')">Reservas</button>
+            <button class="tab" onclick="showTab('autorizacion')">Autorización de Ingreso</button>
         </div>
 
         <!-- Contenido de las pestañas -->
@@ -170,9 +171,6 @@
             <label for="detalle">Detalle:</label>
             <textarea name="detalle" id="detalle" rows="4" cols="50"></textarea>
 
-            <label for="imagen">Subir Imagen:</label>
-            <input type="file" name="imagen" id="imagen" accept="image/*">
-
             <input type="submit" id="savecomplaint" value="Guardar Queja">
             <p id="complaintSaved"></p>
 
@@ -192,7 +190,6 @@
                                 <th>Servicio</th>
                                 <th>Detalle</th>
                                 <th>Estado</th>
-                                <th>Imagen</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -242,8 +239,39 @@
                 </div>
             </div>
         </div>
-    </div>
-
+            <!-- New Content Section for Authorization -->
+            <div id="autorizacion" class="tab-content">
+                <h2>Autorización de Ingreso de Invitados</h2>
+            
+                <!-- Contenido nuevo: Link al formulario de autorización -->
+                <div id="authorizationLink">
+                    <p>Accede al formulario para completar tu solicitud:</p>
+                    <a href="https://tus3bucket.s3.amazonaws.com/formulario.html" target="_blank">Formulario de Autorización</a>
+                </div>   
+                <!-- Fin del contenido nuevo -->
+            
+                <div id="autorizacionConfirmacion"></div>
+                <input type="submit" id="getAutorizaciones" value="Ver Solicitudes de Ingreso">
+                <br><br>
+            
+                <div class="table-container">
+                    <table id="autorizacionTable">
+                        <thead>
+                            <tr>
+                                <th>Nombre del Invitado</th>
+                                <th>Email</th>
+                                <th>Fecha de Ingreso</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Los pedidos de ingreso se verán acá -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
     <script>
         // Función para mostrar una pestaña al hacer clic
         function showTab(tabName) {
