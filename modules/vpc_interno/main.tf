@@ -36,10 +36,3 @@ resource "aws_route_table_association" "example" {
   subnet_id      = each.value.id
   route_table_id = aws_route_table.example.id
 }
-
-resource "aws_vpc_endpoint" "dynamodb" {
-  vpc_id       = aws_vpc.example.id
-  service_name = "com.amazonaws.us-east-1.dynamodb"
-  vpc_endpoint_type = "Gateway"
-  route_table_ids = flatten([aws_route_table.example.id])
-}

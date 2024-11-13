@@ -52,6 +52,12 @@ module "dynamodb_endpoint" {
   route_table_ids  = module.vpc_interno.route_table_ids
 }
 
+module "s3_endpoint" {
+  source           = "./modules/s3_endpoint"
+  vpc_id           = module.vpc_interno.vpc_id
+  route_table_ids  = module.vpc_interno.route_table_ids
+}
+
 module "dynamoReservas" {
   source        = "./modules/dynamo"
   table_name    = "reservasVecinos"
@@ -258,6 +264,11 @@ resource "aws_lambda_function" "presigned_url" {
   filename = "output_lambda_functions/lambda_presignedUrl_src.zip"
   source_code_hash = data.archive_file.presignedUrl_code.output_base64sha256
   depends_on = [ module.vpc_interno ]
+  vpc_config {
+    subnet_ids         = flatten([module.vpc_interno.subnet_ids])
+    security_group_ids = [aws_security_group.lambda_sg.id]
+  }
+  
   environment {
     variables = {
       BUCKET_NAME = module.s3_bucket_presigned.bucket_bucket
@@ -321,7 +332,6 @@ module "s3_static_site_formulario" {
   bucket_name_tag  = "Front formulario visitas" # Puedes cambiar estos valores si necesitas
   environment_tag  = "Prod"
 }
-
 
 # Subir el archivo index.html del formulario de visitas
 resource "aws_s3_object" "index_html" {
