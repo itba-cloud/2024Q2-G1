@@ -73,7 +73,7 @@ echo "$newContent" > $outputFile
 fileContent2=$(cat $inputFile2)
 
 # Concatenar las nuevas variables al inicio del contenido del archivo
-newContent2="$variables2
+newContent2="$variables
 $fileContent2"
 
 # Sobrescribir el archivo scripts.js con el nuevo contenido

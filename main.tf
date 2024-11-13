@@ -285,7 +285,7 @@ resource "aws_lambda_function" "redirect" {
   memory_size   = 128
   filename = "output_lambda_functions/lambda_redirect_src.zip"
   source_code_hash = data.archive_file.redirect_code.output_base64sha256
-  depends_on = [ module.vpc_interno ]
+  depends_on = [ module.vpc_interno, module.s3_static_site ]
   environment {
     variables = {
       REDIRECT_URL = module.s3_static_site.bucket_website_endpoint
