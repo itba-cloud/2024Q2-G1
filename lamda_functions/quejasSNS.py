@@ -29,13 +29,16 @@ def lambda_handler(event, context):
             
             # Crea el mensaje para SNS
             message = {
-                'Urgencia': urgencia,
-                'Tipo': tipo,
-                'Titulo' : titulo,
-                'Detalle': detalle,
-                'Fecha': fecha,
-                'Propietario': nombre_propietario
+                'Se ha efectuado el siguiente reclamo de caracter ugente': {
+                    'Título': titulo,
+                    'Tipo': tipo,
+                    'Detalle': detalle,
+                    'Fecha': fecha,
+                    'Propietario': nombre_propietario,
+                    'Urgencia': urgencia
+                }
             }
+
             
             # Envía el mensaje al admin si es urgencia alta
             if urgencia == 'ALTA':

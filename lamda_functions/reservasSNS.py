@@ -20,9 +20,11 @@ def lambda_handler(event, context):
           
             # Crea el mensaje para SNS
             message = {
-                'Espacio': espacio,
-                'Fecha' : fecha,
-                'Horario': horario,
+                'Confirmación de Reserva': {
+                    'Espacio': espacio,
+                    'Fecha': fecha,
+                    'Horario': horario,
+                }
             }
             
             # Envía el mensaje a SNS

@@ -21,6 +21,23 @@ def lambda_handler(event, context):
     # Obtener el email del usuario desde el token de identidad de Cognito
     email_usuario = event['requestContext']['authorizer']['claims']['email']
     
+    # Convertir la fecha y horario a un objeto datetime completo para la reserva
+    fecha_hora_reserva = datetime.strptime(f"{fecha} {horario}", '%Y-%m-%d %H:%M')
+    fecha_hora_actual = datetime.now()
+    
+    # Verificar que la fecha y horario sean posteriores a la fecha y horario actual
+    if fecha_hora_reserva <= fecha_hora_actual:
+        return {
+            'statusCode': 400,
+            'body': json.dumps({
+                'error': 'La fecha y el horario de la reserva deben ser posteriores al momento actual'
+            }),
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            }
+        }
+    
     # Convertir el horario a un objeto de tiempo
     horario_inicial = datetime.strptime(horario, '%H:%M')
     horario_final = horario_inicial + timedelta(hours=1)  # Duración de 1 hora
