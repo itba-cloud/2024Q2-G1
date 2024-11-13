@@ -42,6 +42,22 @@ def lambda_handler(event, context):
     horario_inicial = datetime.strptime(horario, '%H:%M')
     horario_final = horario_inicial + timedelta(hours=1)  # Duración de 1 hora
 
+    # Verificar que el horario esté entre las 8:00 y las 22:00
+    inicio_permitido = datetime.strptime("08:00", "%H:%M").time()
+    fin_permitido = datetime.strptime("22:00", "%H:%M").time()
+    
+    if not (inicio_permitido <= horario_inicial.time() < fin_permitido):
+        return {
+            'statusCode': 400,
+            'body': json.dumps({
+                'error': 'El horario de la reserva debe estar entre las 8:00 y las 22:00'
+            }),
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            }
+        }
+    
     # Verificar si existe una reserva en el mismo espacio y horario
     response = table.query(
         KeyConditionExpression="pk_fecha = :pk_fecha and begins_with(sk_espacio_reserva, :espacio_prefix)",

@@ -45,6 +45,13 @@ resource "aws_dynamodb_table_item" "queja_jardineria" {
   ITEM
 }
 
+
+module "dynamodb_endpoint" {
+  source           = "./modules/dynamodb_endpoint"
+  vpc_id           = module.vpc_interno.vpc_id
+  route_table_ids  = module.vpc_interno.route_table_ids
+}
+
 module "dynamoReservas" {
   source        = "./modules/dynamo"
   table_name    = "reservasVecinos"
