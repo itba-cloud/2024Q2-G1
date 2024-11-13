@@ -43,3 +43,4 @@ document.getElementById("visitorForm").onsubmit = function(event) {
         document.getElementById("autorizacionMensaje").textContent = "Error de conexión. Intente nuevamente.";
     });
 };
+

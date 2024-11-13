@@ -66,35 +66,76 @@ document.getElementById("savecomplaint").onclick = function() {
             console.error('No token available');
             return;
         }
-        
-        var inputData = {
-            "urgencia": $('#urgencia').val(),
-            "tipo": $('#tipo').val(),
-            "nombre_propietario": $('#nombre_propietario').val(),
-            "titulo": $('#titulo').val(),
-            "detalle": $('#detalle').val()
-        };
 
-        $.ajax({
-            url: API_ENDPOINT+ "/quejasVecinos",
-            type: 'POST',
-            data: JSON.stringify(inputData),
-            contentType: 'application/json; charset=utf-8',
-            headers: {
-                'Authorization': token  // Incluye el token de autorización
-            },
-            success: function (response) {
+        const imageFile = document.getElementById('imagen').files[0]; // Obtén el archivo de imagen del input
+
+        // Verifica si hay un archivo de imagen seleccionado y no está vacío
+        if (imageFile && imageFile.size > 0) {
+            // Paso 1: Solicita la URL presignada desde la Lambda
+            fetch(API_ENDPOINT + "/subirImagen", {
+                method: 'GET',
+                headers: {
+                    'Authorization': token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const presignedUrl = data.presigned_url;
+                const imageUrl = presignedUrl.split('?')[0]; // Extrae la URL base sin los parámetros de firma
+                
+                // Paso 2: Sube la imagen usando la URL presignada
+                return fetch(presignedUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': imageFile.type  // Define el tipo de contenido basado en el archivo
+                    },
+                    body: imageFile
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Error al subir la imagen");
+                    }
+                    return imageUrl;  // Devuelve la URL de la imagen
+                });
+            })
+            .then(imageUrl => {
+                // Paso 3: Añade el link de la imagen al inputData
+                var inputData = {
+                    "urgencia": $('#urgencia').val(),
+                    "tipo": $('#tipo').val(),
+                    "nombre_propietario": $('#nombre_propietario').val(),
+                    "titulo": $('#titulo').val(),
+                    "detalle": $('#detalle').val(),
+                    "imagen_url": imageUrl  // Guarda la URL de la imagen
+                };
+
+                // Paso 4: Envía los datos de la queja con la URL de la imagen
+                return $.ajax({
+                    url: API_ENDPOINT + "/quejasVecinos",
+                    type: 'POST',
+                    data: JSON.stringify(inputData),
+                    contentType: 'application/json; charset=utf-8',
+                    headers: {
+                        'Authorization': token
+                    }
+                });
+            })
+            .then(() => {
                 document.getElementById("complaintSaved").innerHTML = "Funcionó";
-            },
-            error: function () {
-                alert("F. No funcionó");
-            }
-        });
+            })
+            .catch(error => {
+                console.error('Error al subir la imagen o guardar la queja:', error);
+                alert("No funcionó");
+            });
+        } else {
+            console.log("No se seleccionó ninguna imagen o el archivo está vacío");
+            alert("Por favor, selecciona una imagen válida para subir.");
+        }
     })
     .catch(error => {
         console.error('Error obteniendo el token:', error);
     });
-}
+};
 
 // AJAX GET request to retrieve all students
 document.getElementById("getstudents").onclick = function(){
@@ -123,6 +164,7 @@ document.getElementById("getstudents").onclick = function(){
                         <td>" + data['titulo'] + "</td> \
                         <td>" + data['detalle'] + "</td> \
                         <td>" + data['estado'] + "</td> \
+                        <td><a href='" + data['imagen'] + "' target='_blank'>Ver imagen</a></td> \
                         </tr>");
                 });
             },
@@ -213,6 +255,7 @@ document.getElementById("getReservas").onclick = function(){
     });      
 }
 
+//Autorizaciones
 document.getElementById("getAutorizaciones").onclick = function() {
     console.log("Esta pensando");
     getToken()
@@ -238,9 +281,9 @@ document.getElementById("getAutorizaciones").onclick = function() {
                         <td>" + data['documentoVisitante'] + "</td> \
                         <td>" + data['fechaIngreso'] + "</td> \
                         <td id='estado_" + data['id'] + "'>" + data['estado'] + "</td> \
-                        <td><button onclick='cambiarEstado(" + data['id'] + ", \"Aprobado\")'>Aprobar</button> \
-                            <button onclick='cambiarEstado(" + data['id'] + ", \"Denegado\")'>Denegar</button></td> \
-                        </tr>");
+                        <td><button onclick='cambiarEstado(\"" + data['pk'] + "\", \"" + data['sk']+ "\", \"" + data['id'] + "\", \"Aprobado\")'>Aprobar</button> \
+                            <button onclick='cambiarEstado(\"" + data['pk'] + "\", \"" + data['sk']+ "\", \"" + data['id'] + "\", \"Denegado\")'>Denegar</button></td> \
+                    </tr>");
                 });
             },
             error: function () {
@@ -254,22 +297,24 @@ document.getElementById("getAutorizaciones").onclick = function() {
 }
 
 // *** NUEVO *** AJAX POST para cambiar el estado de la solicitud
-function cambiarEstado(solicitudId, nuevoEstado) {
+function cambiarEstado(pk, sk, id, nuevoEstado) {
     getToken()
     .then(token => {
         if (!token) {
             console.error('No token available');
             return;
         }
-
         var updateData = {
-            "id": solicitudId,
-            "estado": nuevoEstado
+            "pk": pk,
+            "sk": sk,
+            "nuevo_estado": nuevoEstado
         };
 
+        console.log(updateData)
+
         $.ajax({
-            url: API_ENDPOINT + "/solicitudesIngreso",
-            type: 'POST',
+            url: API_ENDPOINT + "/entradasVisitas",
+            type: 'PATCH',
             data: JSON.stringify(updateData),
             contentType: 'application/json; charset=utf-8',
             headers: {
@@ -277,7 +322,8 @@ function cambiarEstado(solicitudId, nuevoEstado) {
             },
             success: function (response) {
                 // Actualizar el estado en la tabla
-                document.getElementById("estado_" + solicitudId).innerHTML = nuevoEstado;
+                console.log(id);
+                document.getElementById("estado_" + id).innerHTML = nuevoEstado;
             },
             error: function () {
                 alert("Error al actualizar el estado de la solicitud.");
@@ -287,4 +333,9 @@ function cambiarEstado(solicitudId, nuevoEstado) {
     .catch(error => {
         console.error('Error obteniendo el token:', error);
     });
+}
+
+function iralformulario() {
+    const url = "http://"+ bucket_formulario; // Cambia a la URL que deseas abrir
+    window.open(url, "_blank"); // "_blank" abre el enlace en una nueva pestaña o ventana
 }

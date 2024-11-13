@@ -46,6 +46,7 @@ $inputFile2 = "web_formulario/base_scripts.js"
 # Lee el archivo JSON
 $jsonData = Get-Content -Path $jsonFile | ConvertFrom-Json
 $API_ENDPOINT = $jsonData.invoke_url.value
+$bucket_formulario = $jsonData.website_url_formulario.value
 $REDIRECT_URL = $jsonData.invoke_url.value + "/redirectBucket"
 $userPoolId = $jsonData.user_pool_id.value
 $bucketLink = $jsonData.website_url.value
@@ -58,6 +59,7 @@ const API_ENDPOINT = "$API_ENDPOINT";
 const REDIRECT_URL = "$REDIRECT_URL";
 const userPoolId = "$userPoolId";
 const COGNITO_DOMAIN = "$cognito_domain";
+const bucket_formulario = "$bucket_formulario";
 "@
 
 # Leer el contenido actual del archivo base_scripts.js

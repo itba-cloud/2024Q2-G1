@@ -23,6 +23,11 @@ variable "getEntrada_lambda_uri" {
   type        = string
 }
 
+variable "editEntrada_lambda_uri" {
+  description = "URI de la función Lambda para el método GET"
+  type        = string
+}
+
 variable "getImagen_lambda_uri" {
   description = "URI de la función Lambda para el método GET de la imagen"
   type        = string
@@ -63,6 +68,11 @@ variable "get_lambda_function_name" {
 }
 
 variable "getEntrada_lambda_function_name" {
+  description = "Nombre de la función Lambda para el método GET"
+  type        = string
+}
+
+variable "editEntrada_lambda_function_name" {
   description = "Nombre de la función Lambda para el método GET"
   type        = string
 }

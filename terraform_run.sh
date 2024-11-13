@@ -43,6 +43,7 @@ inputFile2="web_formulario/base_scripts.js"
 jsonData=$(cat $jsonFile)
 API_ENDPOINT=$(echo $jsonData | jq -r '.invoke_url.value')
 REDIRECT_URL=$(echo $jsonData | jq -r '.invoke_url.value')"/redirectBucket"
+bucket_formulario=$(echo $jsonData | jq -r '.website_url_formulario.value')
 userPoolId=$(echo $jsonData | jq -r '.user_pool_id.value')
 bucketLink=$(echo $jsonData | jq -r '.website_url.value')
 bucketLinkcode=$(echo $jsonData | jq -r '.website_url.value')"?code={code}"
@@ -54,6 +55,7 @@ const API_ENDPOINT = "$API_ENDPOINT";
 const REDIRECT_URL = "$REDIRECT_URL";
 const userPoolId = "$userPoolId";
 const COGNITO_DOMAIN = "$cognito_domain";
+const bucket_formulario = "$bucket_formulario";
 EOF
 )
 

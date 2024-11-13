@@ -24,6 +24,12 @@ data "archive_file" "post_entrada_code" {
     output_path = "output_lambda_functions/lambda_postEntrada_src.zip"
 }
 
+data "archive_file" "edit_entrada_code" {
+    type = "zip"
+    source_file = "lamda_functions/editEntrada.py"
+    output_path = "output_lambda_functions/lambda_editEntrada_src.zip"
+}
+
 data "archive_file" "redirect_code" {
     type = "zip"
     source_file = "lamda_functions/redirect.py"
